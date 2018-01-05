@@ -25,6 +25,8 @@ type Tail struct {
 
 type Config struct {
 	Timeout int
+	SplitOn string
+	Output  []int
 }
 
 // NewTail creates a new Tail Object.  During initialization, it checks to see
@@ -192,7 +194,12 @@ func (t *Tail) listenAndReadLines() {
 				continue
 			}
 
-			t.Lines <- strings.TrimRight(line, "\n")
+			l := strings.Split(strings.TrimRight(line, "\n"), t.config.SplitOn)
+			format := make([]string, 0)
+			for i := 0; i < len(t.config.Output); i++ {
+				format = append(format, l[t.config.Output[i]])
+			}
+			t.Lines <- strings.Join(format, " ")
 		}
 	}()
 }
